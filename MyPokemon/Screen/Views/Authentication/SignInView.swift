@@ -1,6 +1,6 @@
 //
 //  SignIn.swift
-//  SclaNote
+//  MyPokemon
 //
 
 
@@ -12,10 +12,11 @@ struct SignInView: View {
     @Binding var isSignInPresented: Bool
     @State var email: String = ""
     @State var password: String = ""
-    
-//    let gradient = Gradient(stops: [.init(color: Color.cyan.opacity(0.6), location: 0.0), .init(color: Color.purple.opacity(0.6), location: 1.0)])
-    
-    let gradient = Gradient(stops: [.init(color: Color.cyan, location: 0.0), .init(color: Color.purple, location: 1.0)])
+
+    let gradient = Gradient(stops: [
+        .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),  // 橙（オレンジ）
+        .init(color: Color(red: 1.0, green: 0.4, blue: 0.4), location: 1.0)   // 明るい赤（コーラル寄り）
+    ])
     
     
     var body: some View {
@@ -63,7 +64,7 @@ struct SignInView: View {
                 .padding(.bottom, 80)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
                 
-                ActionWideButton(label: "ログイン", fontColor: Color.blue, width: 300, height: 36, action: {
+                CustomWideButton(label: "ログイン", fontColor: Color.blue, width: 300, height: 36, action: {
                     isSignInPresented = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
                         authState.isAuth = true
