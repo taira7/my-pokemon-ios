@@ -38,29 +38,24 @@ struct PokemonListItem: View {
                     }
                 }
             } else {
-                // URLがnilなら代替イメージ
-                Image(systemName: "xmark.circle")
+                // 画像データがnilのときのイメージ
+                Image(systemName: "square.slash")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 50, height: 50)
                     .padding(10)
             }
             VStack{
-                HStack{
-//                    Text("\(pokemonDetail.id)")
-//                        .font(.title3)
                     Text(pokemonDetail.name)
                         .font(.title2)
                     //  .background(Color.gray)
                         .frame(maxWidth: .infinity,alignment: .leading)
-                }
-                    
                 
                 HStack{
                     ForEach(pokemonDetail.types, id: \.type.name){ types in
                         Text(types.type.name)
                             .font(.headline)
-                            .frame(width: 65)
+                            .frame(width: 62)
                             .foregroundColor(Color.white)
                             .padding(.vertical,5)
                             .padding(.horizontal,10)
@@ -69,7 +64,8 @@ struct PokemonListItem: View {
                     }
                 }
                 .frame(maxWidth: .infinity,alignment: .leading)
-                .padding(.leading,30)
+                .padding(.leading,12)
+//                .background(Color.orange)
             }
 //            .background(Color.red)
             
@@ -77,7 +73,8 @@ struct PokemonListItem: View {
                 Image(systemName: "heart.fill")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 25, height: 25)
+                    .frame(width: 25, height: 25,alignment: .trailing)
+                    .padding(.horizontal,8)
                     .foregroundStyle(Color.pink)
                     .onTapGesture {
                         isFavorite = false
@@ -86,15 +83,22 @@ struct PokemonListItem: View {
                 Image(systemName: "heart")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 25, height: 25)
+                    .frame(width: 25, height: 25,alignment: .trailing)
+                    .padding(.horizontal,8)
+//                    .background(Color.red)
                     .foregroundStyle(Color.pink)
                     .onTapGesture {
                         isFavorite = true
                     }
             }
-            
         }
         .listRowSeparator(.hidden)
+//        .frame(width: .infinity, height: 100)
+//        .cornerRadius(16)
+//        .overlay(
+//            RoundedRectangle(cornerRadius: 16)
+//                .stroke(Color.gray, lineWidth: 1)
+//        )
     }
 }
 

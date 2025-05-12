@@ -50,7 +50,7 @@ struct PokemonIdTab: View {
                         VStack{
                             Text("\(range[0])-\(range[1])")
                             Rectangle()
-                                .fill(Color.blue)
+                                .fill(Color("ThemeColor"))
                                 .frame(height: 3)
                                 .cornerRadius(4)
                                 .opacity(selectedTab ==  index ? 1.0 : 0.1)

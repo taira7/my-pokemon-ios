@@ -11,6 +11,9 @@ struct PokemonList: View {
         List(pokemonListService.pokemonDetails, id: \.id) { pokemon in
             PokemonListItem(pokemonDetail: pokemon)
         }
+        .listStyle(PlainListStyle())
+//        .scrollContentBackground(.hidden)
+//        .background(Color.white)
     }
 }
 

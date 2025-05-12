@@ -1,18 +1,90 @@
 //
 //  NavigationBarModifier.swift
 //  MyPokemon
-//
-//  Created by 平良将泰 on 2025/05/09.
-//
 
 import SwiftUI
 
-struct NavigationBarModifier: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+
+//MARK: NavigationBar全体の表示
+struct NavigationBarOptions{
+    var title: String?
+    let isVisible: Bool
+}
+
+private struct NavigationBarModifier: ViewModifier{
+    var options: NavigationBarOptions
+    init(options: NavigationBarOptions) {
+        self.options = options
+        setAppearance()
+    }
+    
+    func body(content: Content) -> some View {
+        let title = options.title ?? ""
+        let isShowNavigationBar = options.isVisible
+        
+        content
+            .navigationBarTitleDisplayMode(.inline)//タイトルの表示形式
+            .navigationTitle(title)
+            .navigationBarHidden(isShowNavigationBar ? false : true)
+    }
+    
+    private func setAppearance(){
+        //UIKitのオブジェクト
+        let appearance = UINavigationBarAppearance()
+        
+        //背景色の設定
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(named: "ThemeColor")
+        
+        //下線の色
+        appearance.shadowColor = .clear
+        
+        //タイトルの色
+        appearance.titleTextAttributes = [.foregroundColor:UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor:UIColor.white]
+        
+        //設定を適応させる
+        //スクロールが一番上以外のとき
+        UINavigationBar.appearance().standardAppearance = appearance
+        //スクロールが一番上のとき
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
 }
 
-#Preview {
-    NavigationBarModifier()
+extension View {
+    func navigationBarSetting(title:String,isVisible: Bool) -> some View {
+        modifier(NavigationBarModifier(options: .init(title: title, isVisible: isVisible)))
+    }
+}
+
+//MARK: NavigationBarのアイコンの設定
+struct NavigationBarIconOptions{
+    let name: String
+    let color: Color
+    let isEnable: Bool
+    let action: () -> Void
+}
+
+private struct NavigationBarIconModifier: ViewModifier {
+    var options: NavigationBarIconOptions
+    init(options: NavigationBarIconOptions) {
+        self.options = options
+    }
+    func body(content: Content) -> some View {
+        content
+            .toolbar{
+                ToolbarItem(placement:.navigationBarTrailing){
+                    Button(action: options.action,label: {
+                        Image(systemName: options.name)
+                            .foregroundColor(options.isEnable ? .white : .gray)})
+                            .disabled(!options.isEnable)
+                }
+            }
+    }
+}
+
+extension View {
+    func NavigationBarIconSetting(name:String,color:Color,isEnable:Bool,action:@escaping ()->Void)-> some View {
+        modifier(NavigationBarIconModifier(options: .init(name: name, color: color,isEnable: isEnable,action: action)))
+    }
 }

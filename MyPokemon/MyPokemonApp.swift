@@ -1,9 +1,6 @@
 //
 //  MyPokemonApp.swift
 //  MyPokemon
-//
-//  Created by 平良将泰 on 2025/04/25.
-//
 
 import SwiftUI
 
@@ -11,7 +8,8 @@ import SwiftUI
 struct MyPokemonApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            InitialView()
+                .environmentObject(AuthState())
         }
     }
 }

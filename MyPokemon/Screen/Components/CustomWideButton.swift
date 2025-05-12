@@ -1,18 +1,30 @@
 //
 //  customWideButton.swift
 //  MyPokemon
-//
-//  Created by 平良将泰 on 2025/05/08.
-//
 
 import SwiftUI
 
-struct customWideButton: View {
+struct CustomWideButton: View {
+        let label: String
+        let fontColor: Color
+        let width: CGFloat
+        let height: CGFloat
+        let action: () -> Void
+        
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button(action: action, label: {
+            Text(label)
+                .frame(minWidth: width,minHeight: height)
+                .foregroundColor(fontColor)
+                .bold()
+        })
+        .frame(
+            width: width,
+            height: height
+        )
+        .background(Color.white)
+        .cornerRadius(20)
+        .shadow(radius: 8)
+        .contentShape(Rectangle())
     }
-}
-
-#Preview {
-    customWideButton()
 }
