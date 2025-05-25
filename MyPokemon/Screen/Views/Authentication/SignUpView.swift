@@ -5,7 +5,7 @@
 import SwiftUI
 
 struct SignUpView: View {
-    @EnvironmentObject var authState: AuthState
+    @EnvironmentObject var authState: AuthService
     @Binding var isSignUpPresented: Bool
     @State var name: String = ""
     @State var email: String = ""
@@ -90,5 +90,5 @@ struct SignUpView: View {
 #Preview {
     @Previewable @State var isSignUpPresented: Bool = true
     SignUpView(isSignUpPresented: $isSignUpPresented)
-        .environmentObject(AuthState())
+        .environmentObject(AuthService())
 }

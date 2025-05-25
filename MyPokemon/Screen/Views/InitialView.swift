@@ -5,14 +5,11 @@
 import SwiftUI
 
 struct InitialView: View {
-    @EnvironmentObject var authState: AuthState
+    @EnvironmentObject var authState: AuthService
     
 //    @State private var selectedTab : String = "PokemonListView"
 //    @State private var selectedTab : String = "FriendListView"
     @State private var selectedTab : String = "MyPageView"
-    
-    
-    
     
     init() {
         let appearance: UITabBarAppearance = UITabBarAppearance()
@@ -63,5 +60,5 @@ struct InitialView: View {
 
 #Preview {
     InitialView()
-        .environmentObject(AuthState())
+        .environmentObject(AuthService())
 }

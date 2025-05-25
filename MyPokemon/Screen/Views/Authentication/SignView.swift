@@ -11,8 +11,8 @@ struct SignView: View {
     @State var isSignUpPresented: Bool = false
     
     let gradient = Gradient(stops: [
-        .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),  // 橙（オレンジ）
-        .init(color: Color(red: 1.0, green: 0.4, blue: 0.4), location: 1.0)   // 明るい赤（コーラル寄り）
+        .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),
+        .init(color: Color(red: 1.0, green: 0.4, blue: 0.4), location: 1.0)
     ])
     
     var body: some View {
