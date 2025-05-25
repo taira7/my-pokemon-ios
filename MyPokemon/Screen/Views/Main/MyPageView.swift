@@ -16,7 +16,7 @@ struct DummyUserData: Identifiable {
 
 struct MyPageView: View {
     @State var dummyUser: DummyUserData = .init()
-    @EnvironmentObject var authState: AuthState
+    @EnvironmentObject var authState: AuthService
     
     //仮置き
     @ObservedObject var pokemonListService: PokemonListService = PokemonListService()
