@@ -21,8 +21,8 @@ struct InitialView: View {
     var body: some View {
         ZStack{
             if !authService.isAuth{
-//                SignView()
-                TestView()
+                SignView()
+//                TestView()
             }else{
                 TabView(selection:$selectedTab){
                     NavigationStack{
