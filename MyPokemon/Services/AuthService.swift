@@ -6,7 +6,7 @@ import SwiftUI
 import FirebaseAuth
 
 final class AuthService:ObservableObject{
-    @Published var isAuth: Bool = true
+    @Published var isAuth: Bool = false
     @Published var currentUser: User? = nil
     
     init(){
@@ -24,7 +24,9 @@ final class AuthService:ObservableObject{
             if let userData = authResult?.user{
                 print("signUp success: \(userData)")
                 self.signIn(email: email, password: password)
-                self.isAuth = true
+                DispatchQueue.main.async {
+                    self.isAuth = true
+                }
             }
         }
     }
@@ -37,7 +39,9 @@ final class AuthService:ObservableObject{
             
             if let userData = authResult?.user{
                 print("signIn success: \(userData)")
-                self?.isAuth = true
+                DispatchQueue.main.async {
+                    self?.isAuth = true
+                }
             }
         }
     }
@@ -55,12 +59,15 @@ final class AuthService:ObservableObject{
             _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             //weakではoptional型になる
             print("observedAuthChanges:",user)
-            self?.currentUser = user
-            if user != nil {
-                self?.isAuth = true
-            }else{
-                self?.isAuth = false
-            }
+                
+            DispatchQueue.main.async {
+                self?.currentUser = user
+                if user != nil {
+                    self?.isAuth = true
+                }else{
+                    self?.isAuth = false
+                }
+                }
             
         }
     }

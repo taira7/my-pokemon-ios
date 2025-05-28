@@ -19,7 +19,6 @@ struct FriendListView: View {
         
             GeometryReader{ geometry in
                 VStack{
-                    Text("フレンド一覧")
                     List{
                         ForEach(dummyFriends,id: \.uid){ friend in
                             ProfileCard(
