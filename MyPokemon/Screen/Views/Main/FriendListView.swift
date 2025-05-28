@@ -4,20 +4,14 @@
 
 import SwiftUI
 
-struct DummyFriendData{
-    let id:String
-    let name:String
-    let email:String
-}
-
 struct FriendListView: View {
-    var dummyFriends:[DummyUserData] = [
-        .init(id: "UfBHZgtaP1bCEMl37nNkySA2mhm2", name: "aaaaaaaaaaaaaaaaaaaaaaaaaaa", email: "a@gmail.com"),
-        .init(id: "2", name: "b", email: "bbbbbbbbbbbbb@gmail.com"),
-        .init(id: "3", name: "c", email: "c@gmail.com"),
-        .init(id: "4", name: "d", email: "d@gmail.com"),
-        .init(id: "5", name: "e", email: "e@gmail.com"),
-        .init(id: "6", name: "f", email: "f@gmail.com")
+    var dummyFriends:[UserInfo] = [
+        .init(uid: "UfBHZgtaP1bCEMl37nNkySA2mhm2", name: "aaaaaaaaaaaaaaaaaaaaaaaaaaa", email: "a@gmail.com"),
+        .init(uid: "2", name: "b", email: "bbbbbbbbbbbbb@gmail.com"),
+        .init(uid: "3", name: "c", email: "c@gmail.com"),
+        .init(uid: "4", name: "d", email: "d@gmail.com"),
+        .init(uid: "5", name: "e", email: "e@gmail.com"),
+        .init(uid: "6", name: "f", email: "f@gmail.com")
     ]
     @State var tapCount = 0
     
@@ -27,7 +21,7 @@ struct FriendListView: View {
                 VStack{
                     Text("フレンド一覧")
                     List{
-                        ForEach(dummyFriends){ friend in
+                        ForEach(dummyFriends,id: \.uid){ friend in
                             ProfileCard(
                                 width: geometry.size.width * 0.85,
                                 height: geometry.size.height * 0.2,

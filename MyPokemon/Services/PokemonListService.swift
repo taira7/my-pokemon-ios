@@ -40,7 +40,7 @@ struct PokemonDetail: Decodable {
 }
 
 @MainActor
-class PokemonListService:ObservableObject {
+ final class PokemonListService:ObservableObject {
     
     init() {
         Task {

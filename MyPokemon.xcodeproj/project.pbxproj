@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		BB68DFA82DD215AC006A4F4B /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = BB68DFA72DD215AC006A4F4B /* FirebaseAnalytics */; };
+		BB68DFAA2DD215AC006A4F4B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = BB68DFA92DD215AC006A4F4B /* FirebaseAuth */; };
+		BB68DFAC2DD215AC006A4F4B /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = BB68DFAB2DD215AC006A4F4B /* FirebaseCore */; };
+		BB68DFAE2DD215AC006A4F4B /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = BB68DFAD2DD215AC006A4F4B /* FirebaseDatabase */; };
+		BB68DFE22DD2FD63006A4F4B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB68DFCB2DD2FD63006A4F4B /* GoogleService-Info.plist */; };
+		BBA0B4652DE046C900685948 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = BBA0B4642DE046C900685948 /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		BB1774492DBB665C00440940 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +36,7 @@
 		BB1774382DBB665A00440940 /* MyPokemon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyPokemon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB1774482DBB665C00440940 /* MyPokemonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyPokemonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB1774522DBB665C00440940 /* MyPokemonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MyPokemonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BB68DFCB2DD2FD63006A4F4B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +62,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB68DFA82DD215AC006A4F4B /* FirebaseAnalytics in Frameworks */,
+				BB68DFAC2DD215AC006A4F4B /* FirebaseCore in Frameworks */,
+				BB68DFAE2DD215AC006A4F4B /* FirebaseDatabase in Frameworks */,
+				BBA0B4652DE046C900685948 /* FirebaseFirestore in Frameworks */,
+				BB68DFAA2DD215AC006A4F4B /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,6 +94,7 @@
 				BB17744B2DBB665C00440940 /* MyPokemonTests */,
 				BB1774552DBB665C00440940 /* MyPokemonUITests */,
 				BB1774392DBB665A00440940 /* Products */,
+				BB68DFCB2DD2FD63006A4F4B /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -112,6 +128,11 @@
 			);
 			name = MyPokemon;
 			packageProductDependencies = (
+				BB68DFA72DD215AC006A4F4B /* FirebaseAnalytics */,
+				BB68DFA92DD215AC006A4F4B /* FirebaseAuth */,
+				BB68DFAB2DD215AC006A4F4B /* FirebaseCore */,
+				BB68DFAD2DD215AC006A4F4B /* FirebaseDatabase */,
+				BBA0B4642DE046C900685948 /* FirebaseFirestore */,
 			);
 			productName = MyPokemon;
 			productReference = BB1774382DBB665A00440940 /* MyPokemon.app */;
@@ -196,6 +217,9 @@
 			);
 			mainGroup = BB17742F2DBB665A00440940;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = BB1774392DBB665A00440940 /* Products */;
 			projectDirPath = "";
@@ -213,6 +237,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB68DFE22DD2FD63006A4F4B /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +586,45 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.12.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		BB68DFA72DD215AC006A4F4B /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		BB68DFA92DD215AC006A4F4B /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		BB68DFAB2DD215AC006A4F4B /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		BB68DFAD2DD215AC006A4F4B /* FirebaseDatabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseDatabase;
+		};
+		BBA0B4642DE046C900685948 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = BB68DFA42DD213AD006A4F4B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = BB1774302DBB665A00440940 /* Project object */;
 }

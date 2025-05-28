@@ -5,14 +5,11 @@
 import SwiftUI
 
 struct InitialView: View {
-    @EnvironmentObject var authState: AuthState
-    
 //    @State private var selectedTab : String = "PokemonListView"
 //    @State private var selectedTab : String = "FriendListView"
     @State private var selectedTab : String = "MyPageView"
     
-    
-    
+    @EnvironmentObject var authService:AuthService
     
     init() {
         let appearance: UITabBarAppearance = UITabBarAppearance()
@@ -23,9 +20,9 @@ struct InitialView: View {
     
     var body: some View {
         ZStack{
-            if !authState.isAuth{
-                SignView()
-                
+            if !authService.isAuth{
+//                SignView()
+                TestView()
             }else{
                 TabView(selection:$selectedTab){
                     NavigationStack{
@@ -63,5 +60,5 @@ struct InitialView: View {
 
 #Preview {
     InitialView()
-        .environmentObject(AuthState())
+        .environmentObject(AuthService())
 }
