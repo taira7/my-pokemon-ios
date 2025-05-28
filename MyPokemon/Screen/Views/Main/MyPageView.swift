@@ -16,7 +16,9 @@ struct DummyUserData: Identifiable {
 
 struct MyPageView: View {
     @State var dummyUser: DummyUserData = .init()
-    @EnvironmentObject var authState: AuthService
+    @State var userInfo: UserInfo = UserInfo(uid: "", name: "", email: "")
+    @EnvironmentObject var authService: AuthService
+    let firebaseService: FirebaseService = FirebaseService()
     
     //仮置き
     @ObservedObject var pokemonListService: PokemonListService = PokemonListService()
@@ -29,7 +31,7 @@ struct MyPageView: View {
                 ProfileCard(
                     width: geometry.size.width * 0.9,
                     height: geometry.size.height * 0.2,
-                    user: dummyUser,
+                    user: userInfo,
                     isShowEmail: true
                 )
                 .padding(.top,20)
@@ -56,11 +58,18 @@ struct MyPageView: View {
         }
         .navigationBarSetting(title: "マイページ", isVisible: true)
         .NavigationBarIconSetting(name: "rectangle.portrait.and.arrow.right.fill", color: Color.white, isEnable: true, action: {
-            authState.isAuth = false
+//            authService.signOut()
+            authService.isAuth = false
         })
+        .onAppear(){
+            Task{
+               userInfo = await firebaseService.fetchUserInfo(uid: authService.currentUser?.uid ?? "")
+            }
+        }
     }
 }
 
 #Preview {
     MyPageView()
+        .environmentObject(AuthService())
 }

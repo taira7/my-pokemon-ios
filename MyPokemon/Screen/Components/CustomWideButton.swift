@@ -9,6 +9,7 @@ struct CustomWideButton: View {
         let fontColor: Color
         let width: CGFloat
         let height: CGFloat
+        let isDisabled: Bool
         let action: () -> Void
         
     var body: some View {
@@ -26,5 +27,7 @@ struct CustomWideButton: View {
         .cornerRadius(20)
         .shadow(radius: 8)
         .contentShape(Rectangle())
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.5 : 1.0)
     }
 }
