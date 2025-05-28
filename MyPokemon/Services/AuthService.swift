@@ -5,22 +5,18 @@
 import SwiftUI
 import FirebaseAuth
 
-//シングルトンに変更する
-class AuthService: ObservableObject{
-    @Published var isAuth: Bool = false
+final class AuthService:ObservableObject{
+    @Published var isAuth: Bool = true
+    @Published var currentUser: User? = nil
     
-    static let shared = AuthService()
-    
-    private var currentUser: User?
-    
-    init(){}
-    
-//    var currentUser: User?{
-//        return Auth.auth().currentUser
-//    }
+    init(){
+        observeAuthChanges()
+    }
     
     func signUp(name:String, email: String, password: String){
         Auth.auth().createUser(withEmail: email, password: password){ authResult, error in
+            print("authResult:",authResult)
+            
             if let error = error{
                 print("signUp error: \(error)")
             }
@@ -28,6 +24,7 @@ class AuthService: ObservableObject{
             if let userData = authResult?.user{
                 print("signUp success: \(userData)")
                 self.signIn(email: email, password: password)
+                self.isAuth = true
             }
         }
     }
@@ -40,7 +37,7 @@ class AuthService: ObservableObject{
             
             if let userData = authResult?.user{
                 print("signIn success: \(userData)")
-                self?.isAuth = false
+                self?.isAuth = true
             }
         }
     }
@@ -48,14 +45,23 @@ class AuthService: ObservableObject{
     func signOut(){
         do {
             try Auth.auth().signOut()
+            self.isAuth = false
         } catch let signOutError as NSError {
           print("Error signing out: %@", signOutError)
         }
     }
     
     private func observeAuthChanges() {
-        Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
+            //weakではoptional型になる
+            print("observedAuthChanges:",user)
             self?.currentUser = user
+            if user != nil {
+                self?.isAuth = true
+            }else{
+                self?.isAuth = false
+            }
+            
         }
     }
     

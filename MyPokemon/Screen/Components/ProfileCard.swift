@@ -7,7 +7,7 @@ import SwiftUI
 struct ProfileCard: View {
     let width: CGFloat
     let height: CGFloat
-    let user: DummyUserData
+    let user: UserInfo
     let isShowEmail: Bool
     
     var body: some View {
@@ -35,13 +35,13 @@ struct ProfileCard: View {
                     
                     
                     HStack{
-                        Text("\(user.id)")
+                        Text(user.uid)
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity,alignment: .leading)
                             .lineLimit(1)
                         Button(action: {
-                            UIPasteboard.general.string = user.id
+                            UIPasteboard.general.string = user.uid
                             print("コピーされました")
                         }){
                             ZStack{
