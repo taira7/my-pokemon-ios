@@ -16,7 +16,7 @@ struct FriendRequestInfo{
     let uid: String
     let name: String
     let email: String
-    let isRecieved: Bool //false->申請を送った側，true->申請を受け取った側
+    var isRecieved: Bool //false->申請を送った側，true->申請を受け取った側
 }
 
 final class FirebaseService {
@@ -43,16 +43,21 @@ final class FirebaseService {
                 return UserInfo(uid: id, name: name, email: email)
             }else{
                 print("ユーザーが存在しません")
+                return UserInfo(uid: "ユーザーが存在しません", name: "ユーザーが存在しません", email: "")
             }
+            
         }catch{
             print("ユーザー情報の取得失敗しました: \(error)")
+            return UserInfo(uid: "取得できません", name: "取得できません", email: "")
         }
-        // データが取得できなかったときの値
-        return UserInfo(uid: "取得できません", name: "取得できません", email: "")
     }
     
     //ユーザーのお気に入りのポケモンのidを取得
     func fetchFavoritePokemons(uid:String) async -> [Int]{
+        if(uid == ""){
+            print("uidが空です")
+            return []
+        }
         let favoritePokemonRef = db.collection("user").document(uid).collection("favorite")
         var favoritePokemonIds:[Int] = []
         do{
@@ -72,6 +77,10 @@ final class FirebaseService {
     
     //フレンドの情報を取得
     func fetchFriendsList(uid:String)async -> [UserInfo]{
+        if(uid == ""){
+            print("uidが空です")
+            return []
+        }
         let friendsRef = db.collection("user").document(uid).collection("friends")
         
         var friendList:[UserInfo] = []
@@ -98,6 +107,10 @@ final class FirebaseService {
     
     //フレンドリクエストの取得
     func fetchFriendRequestList(uid:String)async -> [FriendRequestInfo]{
+        if(uid == ""){
+            print("uidが空です")
+            return []
+        }
         let friendRequestRef = db.collection("user").document(uid).collection("friendRequest")
         
         var friendRequestList:[FriendRequestInfo] = []
@@ -127,8 +140,32 @@ final class FirebaseService {
     //setData -- documentIDを指定 documentIDが既に存在する場合，上書きされる（同じ内容の重複なし）
     //addDocument -- documentIDは自動生成　（同じ内容の重複あり）
     
+    //アカウント登録時のユーザー登録
+    func addUser(uid: String, name: String, email: String)async -> Void{
+        if(uid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
+        
+        let userRef = db.collection("user").document(uid)
+        do {
+            try await userRef.setData([
+                "id": uid,
+                "name": name,
+                "email": email
+            ])
+            print("ユーザー登録に成功しました")
+        } catch {
+            print("ユーザー登録に失敗しました: \(error)")
+        }
+    }
+    
     //お気に入り登録
     func addFavoritePokemon(uid:String,pokemonId:Int)async -> Void{
+        if(uid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
         let favoriteRef = db.collection("user").document(uid).collection("favorite")
         do {
             try await favoriteRef.addDocument(data:[
@@ -142,11 +179,16 @@ final class FirebaseService {
     
     //フレンドの登録
     func addFriend(uid:String,friendUid:String)async -> Void{
+        if(uid == "" || friendUid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
+        
         let userInfo = await fetchUserInfo(uid: uid)
         let friendInfo = await fetchUserInfo(uid: friendUid)
         
-        let userFriendRef = db.collection("user").document(uid).collection("friend")
-        let targetFriendRef = db.collection("user").document(friendUid).collection("friend")
+        let userFriendRef = db.collection("user").document(uid).collection("friends")
+        let targetFriendRef = db.collection("user").document(friendUid).collection("friends")
         
         do{
             //自分側のフレンドに追加
@@ -175,6 +217,10 @@ final class FirebaseService {
     
     //フレンド申請
     func sendFriendRequest(uid:String,friendUid:String)async -> Void{
+        if(uid == "" || friendUid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
         let userInfo = await fetchUserInfo(uid: uid)
         let friendInfo = await fetchUserInfo(uid: friendUid)
         
@@ -207,8 +253,12 @@ final class FirebaseService {
     
     //フレンドの削除
     func deleteFriend(uid: String, friendUid: String)async -> Void{
-        let userFriendRef = db.collection("user").document(uid).collection("friend")
-        let targetFriendRef = db.collection("user").document(friendUid).collection("friend")
+        if(uid == "" || friendUid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
+        let userFriendRef = db.collection("user").document(uid).collection("friends")
+        let targetFriendRef = db.collection("user").document(friendUid).collection("friends")
         do{
             //自分側のフレンド欄から削除
             let userFriendSnapshot = try await userFriendRef.getDocuments()
@@ -247,8 +297,12 @@ final class FirebaseService {
     
     //フレンドリクエストの削除
     func deleteFriendRequest(uid: String, friendUid: String)async -> Void{
-        let userFriendRequestRef = db.collection("user").document(uid).collection("friend")
-        let targetFriendRequestRef = db.collection("user").document(friendUid).collection("friend")
+        if(uid == "" || friendUid == ""){
+            print("uidまたはfriendUidが空です")
+            return
+        }
+        let userFriendRequestRef = db.collection("user").document(uid).collection("friendRequest")
+        let targetFriendRequestRef = db.collection("user").document(friendUid).collection("friendRequest")
         do{
             //自分側のリクエストを削除
             let userFriendRequestSnapshot = try await userFriendRequestRef.getDocuments()
@@ -287,6 +341,10 @@ final class FirebaseService {
     
     //お気に入りの削除
     func deleteFavoritePokemon(uid: String, pokemonId: Int)async -> Void{
+        if(uid == ""){
+            print("uidが空です")
+            return
+        }
         let favoritePokemonRef = db.collection("user").document(uid).collection("favorite")
         do{
             let favoriteSnapshot = try await favoritePokemonRef.getDocuments()
@@ -309,10 +367,14 @@ final class FirebaseService {
     
     //ユーザー情報を全削除
     func deleteAllUserData(uid: String)async -> Void{
+        if(uid == ""){
+            print("uidが空です")
+            return
+        }
         let userDocRef = db.collection("user").document(uid)
         
         //フレンドの全削除
-        let friendRef = userDocRef.collection("friend")
+        let friendRef = userDocRef.collection("friends")
         do{
             let friendSnapshot = try await friendRef.getDocuments()
             for document in friendSnapshot.documents{
@@ -324,7 +386,7 @@ final class FirebaseService {
         }
         
         //フレンドリクエストの全削除
-        let friendRequestRef = userDocRef.collection("friend")
+        let friendRequestRef = userDocRef.collection("friendRequest")
         do{
             let friendRequestSnapshot = try await friendRequestRef.getDocuments()
             for document in friendRequestSnapshot.documents{

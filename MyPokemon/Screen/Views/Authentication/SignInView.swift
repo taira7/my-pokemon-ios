@@ -70,13 +70,14 @@ struct SignInView: View {
                 CustomWideButton(
                     label: "ログイン",
                     fontColor: Color.blue,
+                    backgroundColor: Color.white,
                     width: 300,
                     height: 36,
                     isDisabled: isInputInvalid(),
                     action: {
                         isSignInPresented = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-//                            authService.signIn(email: email, password: password)
+                            authService.signIn(email: email, password: password)
                             authService.isAuth = true
                     }
                 })
