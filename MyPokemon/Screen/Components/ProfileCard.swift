@@ -7,8 +7,9 @@ import SwiftUI
 struct ProfileCard: View {
     let width: CGFloat
     let height: CGFloat
-    let user: DummyUserData
+    let user: UserInfo
     let isShowEmail: Bool
+    let isShowButton: Bool
     
     var body: some View {
         VStack{
@@ -35,24 +36,27 @@ struct ProfileCard: View {
                     
                     
                     HStack{
-                        Text("\(user.id)")
+                        Text(user.uid)
                             .font(.subheadline)
                             .foregroundColor(.gray)
                             .frame(maxWidth: .infinity,alignment: .leading)
                             .lineLimit(1)
-                        Button(action: {
-                            UIPasteboard.general.string = user.id
-                            print("コピーされました")
-                        }){
-                            ZStack{
-                                Circle()
-                                    .stroke(Color.blue)
-                                    .shadow(radius: 1)
-                                    .frame(width: 28,height: 28)
-                                Image(systemName:"document.on.document")
-                                    .resizable()
-                                    .frame(width: 16, height: 16)
-                                    .foregroundColor(Color.blue)
+                        
+                        if isShowButton {
+                            Button(action: {
+                                UIPasteboard.general.string = user.uid
+                                print("コピーされました")
+                            }){
+                                ZStack{
+                                    Circle()
+                                        .stroke(Color.blue)
+                                        .shadow(radius: 1)
+                                        .frame(width: 28,height: 28)
+                                    Image(systemName:"document.on.document")
+                                        .resizable()
+                                        .frame(width: 16, height: 16)
+                                        .foregroundColor(Color.blue)
+                                }
                             }
                         }
                     }

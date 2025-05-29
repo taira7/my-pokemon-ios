@@ -5,14 +5,12 @@
 import SwiftUI
 
 struct SignView: View {
-    
-//    @EnvironmentObject var authState: AuthState
     @State var isSignInPresented: Bool = false
     @State var isSignUpPresented: Bool = false
     
     let gradient = Gradient(stops: [
-        .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),  // 橙（オレンジ）
-        .init(color: Color(red: 1.0, green: 0.4, blue: 0.4), location: 1.0)   // 明るい赤（コーラル寄り）
+        .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),
+        .init(color: Color(red: 1.0, green: 0.4, blue: 0.4), location: 1.0)
     ])
     
     var body: some View {
@@ -32,7 +30,13 @@ struct SignView: View {
                     
                     
                     CustomWideButton(
-                        label: "ログインする", fontColor: Color.blue, width: geometry.size.width * 0.9, height: geometry.size.height * 0.07, action: {
+                        label: "ログインする",
+                        fontColor: Color.blue,
+                        backgroundColor: Color.white,
+                        width: geometry.size.width * 0.9,
+                        height: geometry.size.height * 0.07,
+                        isDisabled: false,
+                        action: {
                             print("ログイン")
                             isSignInPresented.toggle()
                             

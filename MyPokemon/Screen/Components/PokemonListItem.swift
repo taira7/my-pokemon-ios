@@ -7,6 +7,15 @@ import SwiftUI
 struct PokemonListItem: View {
     var pokemonDetail: PokemonDetail
     @State var isFavorite: Bool = false
+    @State var favoritePokemonIds: [Int] = []
+    
+    @EnvironmentObject var authService: AuthService
+    let firebaseService: FirebaseService = FirebaseService()
+    @State var uid:String = ""
+    
+    func isFavoritePokemon() -> Bool {
+        return favoritePokemonIds.contains(pokemonDetail.id)
+    }
     
     var body: some View {
         HStack {
@@ -48,7 +57,6 @@ struct PokemonListItem: View {
             VStack{
                     Text(pokemonDetail.name)
                         .font(.title2)
-                    //  .background(Color.gray)
                         .frame(maxWidth: .infinity,alignment: .leading)
                 
                 HStack{
@@ -65,9 +73,7 @@ struct PokemonListItem: View {
                 }
                 .frame(maxWidth: .infinity,alignment: .leading)
                 .padding(.leading,12)
-//                .background(Color.orange)
             }
-//            .background(Color.red)
             
             if isFavorite {
                 Image(systemName: "heart.fill")
@@ -77,7 +83,10 @@ struct PokemonListItem: View {
                     .padding(.horizontal,8)
                     .foregroundStyle(Color.pink)
                     .onTapGesture {
-                        isFavorite = false
+                        Task{
+                            await firebaseService.deleteFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
+                            isFavorite = false
+                        }
                     }
             }else{
                 Image(systemName: "heart")
@@ -85,36 +94,22 @@ struct PokemonListItem: View {
                     .scaledToFit()
                     .frame(width: 25, height: 25,alignment: .trailing)
                     .padding(.horizontal,8)
-//                    .background(Color.red)
                     .foregroundStyle(Color.pink)
                     .onTapGesture {
-                        isFavorite = true
+                        Task{
+                            await firebaseService.addFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
+                            isFavorite = true
+                        }
                     }
             }
         }
         .listRowSeparator(.hidden)
-//        .frame(width: .infinity, height: 100)
-//        .cornerRadius(16)
-//        .overlay(
-//            RoundedRectangle(cornerRadius: 16)
-//                .stroke(Color.gray, lineWidth: 1)
-//        )
+        .onAppear(){
+                Task{
+                    uid = authService.currentUser?.uid ?? ""
+                    favoritePokemonIds = await firebaseService.fetchFavoritePokemons(uid: uid)
+                    isFavorite = isFavoritePokemon()
+                }
+        }
     }
-}
-
-#Preview {
-    let dummyPokemonDetail = PokemonDetail(
-        id: 1,
-        name: "Pikachu",
-        height: 0.4,
-        weight: 6.0,
-        sprites: PokemonSprite(
-            front_default: URL(string: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"),
-            back_default: URL(string: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/25.png")
-        ),
-        types: [
-            PokemonTypeEntry(type: PokemonType(name: "electric"))
-        ]
-    )
-    PokemonListItem(pokemonDetail: dummyPokemonDetail)
 }

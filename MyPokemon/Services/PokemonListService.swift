@@ -40,50 +40,15 @@ struct PokemonDetail: Decodable {
 }
 
 @MainActor
-class PokemonListService:ObservableObject {
+ final class PokemonListService:ObservableObject {
     
-    init() {
-        Task {
-            await fetchAllPokemonDetails()
-        }
-    }
+     @Published var limit = 100
     
-    @Published var offset = 0
-    @Published var limit = 100
+     @Published var pokemonResponse: PokemonListResponse? = nil
     
-    @Published var pokemonResponse: PokemonListResponse? = nil
+     @Published var isLoading: Bool = false
     
-    var pokemonSummaries: [PokemonSummary] = []
-    @Published var pokemonDetails:[PokemonDetail] = []
-    
-    @Published var isLoading: Bool = false
-    
-//    func getAllPokemonList() -> Void {
-//        let baseURL = "https://pokeapi.co/api/v2/pokemon?offset=\(offset)&limit=\(limit)"
-//        
-//        URLSession.shared.dataTask(with: URL(string: baseURL)!) { (data, response, error) in
-//            
-//            if let error = error {
-//                print("APIリクエストエラー: \(error.localizedDescription)")
-//                return
-//            }
-//            
-//            guard let data = data else { return }
-//            let decoder: JSONDecoder = JSONDecoder()
-//            do {
-//                let resultData = try decoder.decode(PokemonAll.self, from: data)
-//                DispatchQueue.main.async {
-//                    self.pokemonData = resultData.results
-//                    print("API結果",self.pokemonData)
-//                }
-//            } catch {
-//                print("json convert failed in JSONDecoder. " + error.localizedDescription)
-//            }
-//        }.resume()
-//
-//    }
-    
-    func fetchPokemonListResponse() async -> PokemonListResponse? {
+     func fetchPokemonListResponse(offset:Int) async -> PokemonListResponse? {
         let baseURL = "https://pokeapi.co/api/v2/pokemon?offset=\(offset)&limit=\(limit)"
         
         guard let url = URL(string: baseURL) else {
@@ -93,18 +58,10 @@ class PokemonListService:ObservableObject {
         
         do{
             let (data, _ ) = try await URLSession.shared.data(from: url)
-//            print("data",data)
-            
-//            if let httpResponse = URLResponse as? HTTPURLResponse {
-//                print("status code", httpResponse.statusCode)
-//            } else {
-//                print("not an HTTP response")
-//            }
             
             let decoder = JSONDecoder()
             let results = try decoder.decode(PokemonListResponse.self, from: data)
             
-//            print("API結果",results)
             return results
             
         }catch{
@@ -124,7 +81,6 @@ class PokemonListService:ObservableObject {
             let (data, _) = try await URLSession.shared.data(from: url)
             let decoder = JSONDecoder()
             let result = try decoder.decode(PokemonDetail.self, from: data)
-//            print("result: \(result)")
             
             return result
             
@@ -134,18 +90,20 @@ class PokemonListService:ObservableObject {
         }
     }
     
-    func fetchAllPokemonDetails() async -> Void{
+     func fetchAllPokemonDetails(offset:Int) async -> [PokemonDetail]{
+        var pokemonSummaries: [PokemonSummary] = []
+        
         await MainActor.run{
             self.isLoading = true
-            self.pokemonDetails = []
         }
         
-        pokemonResponse = await fetchPokemonListResponse()
-//        print("pokemonResponse:",pokemonResponse ?? "nil")
+         pokemonResponse = await fetchPokemonListResponse(offset: offset)
         guard let pokemonResponse = pokemonResponse else {
             print("ポケモンリスト取得エラー")
-            self.isLoading = false
-            return
+            await MainActor.run{
+                self.isLoading = false
+            }
+            return []
         }
         
         pokemonSummaries = pokemonResponse.results
@@ -158,7 +116,7 @@ class PokemonListService:ObservableObject {
                   group.addTask {
                       if let detail = await self.fetchPokemonDetail(urlString: summary.url) {
                           return (detail.id, detail)
-                      } else {
+                      }else{
                           return nil
                       }
                   }
@@ -181,9 +139,45 @@ class PokemonListService:ObservableObject {
 
         // 一括でUI更新（MainActorで）
         await MainActor.run {
-            self.pokemonDetails = sortedDetails
             self.isLoading = false
         }
+         
+         return sortedDetails
     }
+     
+    //お気に入りのポケモンのデータを取得
+     func fetchFavoritePokemons (pokemonIds: [Int]) async -> [PokemonDetail] {
+             var indexedDetails: [(Int, PokemonDetail)] = [] //ソートのための配列
+             
+             await withTaskGroup(of: (Int,PokemonDetail)?.self){ group in
+                 for id in pokemonIds{
+                     let url = "https://pokeapi.co/api/v2/pokemon/\(id)/"
+                     group.addTask {
+                         if let pokemonDetail = await self.fetchPokemonDetail(urlString: url){
+                             return (pokemonDetail.id,pokemonDetail)
+                         }else{
+                             return nil
+                         }
+                     }
+                 }
+                 
+                 for await result in group {
+                     if let (id, detail) = result {
+                         indexedDetails.append((id, detail))
+                     }
+                 }
+                 
+             }
+         
+             indexedDetails.sort(by: { (first, second) in
+                 return first.0 < second.0
+             })
+             
+             let sortedDetails: [PokemonDetail] = indexedDetails.map(){ detail in
+                 return detail.1
+             }
+         
+         return sortedDetails
+     }
 }
 

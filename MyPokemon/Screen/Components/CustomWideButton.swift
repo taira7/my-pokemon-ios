@@ -7,8 +7,10 @@ import SwiftUI
 struct CustomWideButton: View {
         let label: String
         let fontColor: Color
+        let backgroundColor: Color
         let width: CGFloat
         let height: CGFloat
+        let isDisabled: Bool
         let action: () -> Void
         
     var body: some View {
@@ -22,9 +24,11 @@ struct CustomWideButton: View {
             width: width,
             height: height
         )
-        .background(Color.white)
+        .background(backgroundColor)
         .cornerRadius(20)
         .shadow(radius: 8)
         .contentShape(Rectangle())
+        .disabled(isDisabled)
+        .opacity(isDisabled ? 0.5 : 1.0)
     }
 }
