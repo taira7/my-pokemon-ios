@@ -8,14 +8,15 @@ import FirebaseAuth
 final class AuthService:ObservableObject{
     @Published var isAuth: Bool = false
     @Published var currentUser: User? = nil
+    let firebaseService = FirebaseService()
     
     init(){
         observeAuthChanges()
     }
     
-    func signUp(name:String, email: String, password: String){
+    func signUp(name:String, email: String, password: String) -> Void{
         Auth.auth().createUser(withEmail: email, password: password){ authResult, error in
-            print("authResult:",authResult)
+//            print("authResult:",authResult)
             
             if let error = error{
                 print("signUp error: \(error)")
@@ -23,33 +24,36 @@ final class AuthService:ObservableObject{
             
             if let userData = authResult?.user{
                 print("signUp success: \(userData)")
-                self.signIn(email: email, password: password)
-                DispatchQueue.main.async {
-                    self.isAuth = true
+                Task{
+                    await self.firebaseService.addUser(uid: userData.uid, name: name, email: email)
                 }
+                self.signIn(email: email, password: password)
             }
         }
     }
     
-    func signIn(email: String, password: String){
+    func signIn(email: String, password: String) -> Void{
         Auth.auth().signIn(withEmail: email, password: password){ [weak self] authResult, error in
-                if let error = error{
+            if let error = error{
+                Task{
+                    await self?.signOut()
+                }
                 print("signIn error: \(error)")
             }
             
             if let userData = authResult?.user{
                 print("signIn success: \(userData)")
-                DispatchQueue.main.async {
-                    self?.isAuth = true
-                }
             }
         }
     }
     
-    func signOut(){
+    func signOut()async -> Void{
         do {
             try Auth.auth().signOut()
-            self.isAuth = false
+            print("signOut success:")
+            DispatchQueue.main.async {
+                self.isAuth = false
+            }
         } catch let signOutError as NSError {
           print("Error signing out: %@", signOutError)
         }
@@ -58,7 +62,7 @@ final class AuthService:ObservableObject{
     private func observeAuthChanges() {
             _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             //weakではoptional型になる
-            print("observedAuthChanges:",user)
+//            print("observedAuthChanges:",user)
                 
             DispatchQueue.main.async {
                 self?.currentUser = user

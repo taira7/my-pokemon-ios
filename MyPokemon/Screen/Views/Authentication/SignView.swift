@@ -30,7 +30,13 @@ struct SignView: View {
                     
                     
                     CustomWideButton(
-                        label: "ログインする", fontColor: Color.blue, width: geometry.size.width * 0.9, height: geometry.size.height * 0.07, isDisabled: false, action: {
+                        label: "ログインする",
+                        fontColor: Color.blue,
+                        backgroundColor: Color.white,
+                        width: geometry.size.width * 0.9,
+                        height: geometry.size.height * 0.07,
+                        isDisabled: false,
+                        action: {
                             print("ログイン")
                             isSignInPresented.toggle()
                             

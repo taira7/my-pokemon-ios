@@ -6,20 +6,17 @@ import SwiftUI
 
 struct PokemonIdTab: View {
     @ObservedObject var pokemonListService:PokemonListService
-    @Binding var selectedTab:Int
-    @State var tabRange:[[Int]] = []
+    @Binding var selectedTab: Int
+    @Binding var tabRange: [[Int]]
+    @Binding var offset: Int
     
     let itemWidth:CGFloat = 128
     let itemHeight:CGFloat = 44
     
     func generateTabRange(with totalCount: Int) {
-//        print("generateTabRange called")
-        
         tabRange.removeAll()
         
         let count = totalCount / pokemonListService.limit
-//        print("totalCount:", totalCount)
-//        print("count:", count)
         
         var start = 1
         var end = pokemonListService.limit
@@ -34,11 +31,7 @@ struct PokemonIdTab: View {
         if totalCount % pokemonListService.limit != 0 {
             tabRange.append([start, totalCount])
         }
-
-//        print("tabRange:", tabRange)
     }
-
-    
     
     var body: some View {
         ScrollViewReader{ proxy in
@@ -58,14 +51,9 @@ struct PokemonIdTab: View {
                         .frame(width: itemWidth,height: itemHeight)
                         .onTapGesture {
                             if selectedTab != index {
-                                
                                 selectedTab = index
                                 let range = tabRange[index]
-                                pokemonListService.offset = range[0] - 1
-                                
-                                Task {
-                                    await pokemonListService.fetchAllPokemonDetails()
-                                }
+                                offset = range[0] - 1
                             }
                         }
                         .onChange(of: selectedTab){
@@ -87,7 +75,3 @@ struct PokemonIdTab: View {
         .scrollIndicators(.hidden)
     }
 }
-
-//#Preview {
-//    PokemonIdTab()
-//}

@@ -85,14 +85,15 @@ struct SignUpView: View {
                 CustomWideButton(
                     label: "登録する",
                     fontColor: Color.blue,
+                    backgroundColor: Color.white,
                     width: 300,
                     height: 36,
                     isDisabled: isInputInvalid(),
                     action: {
                         isSignUpPresented = false
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-//                           authService.signUp(name: name, email: email, password: password)
-                        authService.isAuth = true
+                            authService.signUp(name: name, email: email, password: password)
+                            authService.isAuth = true
                     }
                 })
             }
