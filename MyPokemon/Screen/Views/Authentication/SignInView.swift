@@ -50,6 +50,7 @@ struct SignInView: View {
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
+                .keyboardType(.emailAddress)
                 
                 
                 SecureField(
@@ -66,6 +67,7 @@ struct SignInView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 80)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
+                .keyboardType(.alphabet)
                 
                 CustomWideButton(
                     label: "ログイン",
@@ -81,6 +83,22 @@ struct SignInView: View {
                             authService.isAuth = true
                     }
                 })
+            }
+        }
+        .overlay(alignment: .topTrailing){
+            HStack{
+                Spacer()
+                
+                Button(action: {
+                    isSignInPresented = false
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30,alignment: .trailing)
+                        .foregroundColor(.white)
+                        .shadow(radius: 2)
+                        .padding()
+                }
             }
         }
     }

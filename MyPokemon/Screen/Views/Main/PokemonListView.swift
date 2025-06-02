@@ -7,11 +7,13 @@ import SwiftUI
 
 struct PokemonListView: View {
     @ObservedObject var pokemonListService = PokemonListService()
+    @EnvironmentObject var authService:AuthService
     @State private var pokemonDetails: [PokemonDetail] = []
     
     @State var selectedTab:Int = 0
     @State var tabRange:[[Int]] = []
     @State var offset:Int = 0
+    @State var uid:String = ""
     
     var body: some View {
         VStack{
@@ -30,7 +32,7 @@ struct PokemonListView: View {
                                         .background(Color.white.opacity(0.8))
                                     
                                 } else {
-                                    PokemonList(pokemonDetails: pokemonDetails)
+                                    PokemonList(uid: uid, pokemonDetails: pokemonDetails)
                                         .frame(width: geometry.size.width, height: geometry.size.height)
                                 }
                             }else{
@@ -54,6 +56,11 @@ struct PokemonListView: View {
             Task {
                 offset = tabRange[selectedTab][0] - 1
                 pokemonDetails = await pokemonListService.fetchAllPokemonDetails(offset: offset)
+            }
+        }
+        .onAppear{
+            Task{
+                uid = authService.currentUser?.uid ?? ""
             }
         }
     }

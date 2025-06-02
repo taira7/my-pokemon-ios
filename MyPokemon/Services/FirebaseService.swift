@@ -136,6 +136,13 @@ final class FirebaseService {
         }
     }
     
+    //受け取ったフレンドリクエストの確認
+    func hasReceievedFriendRequest(requests:[FriendRequestInfo]) -> Bool{
+        requests.contains{ request in
+            return request.isRecieved == true
+        }
+    }
+    
 //MARK: firebaseへのデータの登録
     //setData -- documentIDを指定 documentIDが既に存在する場合，上書きされる（同じ内容の重複なし）
     //addDocument -- documentIDは自動生成　（同じ内容の重複あり）

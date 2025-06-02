@@ -5,13 +5,14 @@
 import SwiftUI
 
 struct PokemonListItem: View {
+    var uid:String
     var pokemonDetail: PokemonDetail
     @State var isFavorite: Bool = false
+    @State var isDisabled: Bool = false
     @State var favoritePokemonIds: [Int] = []
     
     @EnvironmentObject var authService: AuthService
     let firebaseService: FirebaseService = FirebaseService()
-    @State var uid:String = ""
     
     func isFavoritePokemon() -> Bool {
         return favoritePokemonIds.contains(pokemonDetail.id)
@@ -55,9 +56,9 @@ struct PokemonListItem: View {
                     .padding(10)
             }
             VStack{
-                    Text(pokemonDetail.name)
-                        .font(.title2)
-                        .frame(maxWidth: .infinity,alignment: .leading)
+                Text(pokemonDetail.name)
+                    .font(.title2)
+                    .frame(maxWidth: .infinity,alignment: .leading)
                 
                 HStack{
                     ForEach(pokemonDetail.types, id: \.type.name){ types in
@@ -74,39 +75,41 @@ struct PokemonListItem: View {
                 .frame(maxWidth: .infinity,alignment: .leading)
                 .padding(.leading,12)
             }
-            
-            if isFavorite {
-                Image(systemName: "heart.fill")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 25, height: 25,alignment: .trailing)
-                    .padding(.horizontal,8)
-                    .foregroundStyle(Color.pink)
-                    .onTapGesture {
-                        Task{
-                            await firebaseService.deleteFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
-                            isFavorite = false
-                        }
+            Button(action: {
+                if isFavorite == true{
+                    Task {
+                        await firebaseService.deleteFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
+                        isFavorite = false
                     }
-            }else{
-                Image(systemName: "heart")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 25, height: 25,alignment: .trailing)
-                    .padding(.horizontal,8)
-                    .foregroundStyle(Color.pink)
-                    .onTapGesture {
-                        Task{
-                            await firebaseService.addFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
-                            isFavorite = true
-                        }
+                }else{
+                    Task {
+                        await firebaseService.addFavoritePokemon(uid: uid, pokemonId: pokemonDetail.id)
+                        isFavorite = true
                     }
+                }
+            }) {
+                if isFavorite == true{
+                    Image(systemName: "heart.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 25, height: 25, alignment: .trailing)
+                        .padding(.horizontal, 8)
+                        .foregroundStyle(Color.pink)
+                }else{
+                    Image(systemName: "heart")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 25, height: 25, alignment: .trailing)
+                        .padding(.horizontal, 8)
+                        .foregroundStyle(Color.pink)
+                }
             }
+            .buttonStyle(.plain)
+            .disabled(isDisabled)
         }
         .listRowSeparator(.hidden)
         .onAppear(){
                 Task{
-                    uid = authService.currentUser?.uid ?? ""
                     favoritePokemonIds = await firebaseService.fetchFavoritePokemons(uid: uid)
                     isFavorite = isFavoritePokemon()
                 }

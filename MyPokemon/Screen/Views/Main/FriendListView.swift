@@ -9,15 +9,19 @@ struct FriendListView: View {
     let firebaseService = FirebaseService()
     
     @State var friendsList:[UserInfo] = []
-    @State private var searchText: String = ""
-    @State private var showAddFriendView: Bool = false
-    @State private var matchedUser: UserInfo = .init(uid: "", name: "", email: "")
+    @State private var searchID: String = ""
+    @State private var showAddFriendView: Bool = false //検索バーの表示
+    @State private var matchedUser: UserInfo = .init(uid: "", name: "", email: "") //検索に一致したユーザー
     @State private var errorMessage: String = ""
     @State private var buttonMessage: String = ""
     
     @State private var uid = ""
     @State private var userFriendRequest: [FriendRequestInfo] = []
     @State private var isAlreadyRequested: Bool = false
+    @State private var hasReceivedRequest:Bool = false
+    
+    @State var isFriendProfilePresented: Bool = false
+    @State private var friendInfo: UserInfo = .init(uid: "", name: "", email: "")
     
     var body: some View {
         
@@ -36,7 +40,8 @@ struct FriendListView: View {
                             if showAddFriendView == true {
                                 //入力部分を初期化
                                 matchedUser = .init(uid: "", name: "", email: "")
-                                searchText = ""
+                                searchID = ""
+                                
                                 showAddFriendView = false
                             }else{
                                 showAddFriendView = true
@@ -70,20 +75,19 @@ struct FriendListView: View {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.gray)
                             
-                            TextField("IDを入力", text: $searchText)
+                            TextField("IDを入力", text: $searchID)
                                 .textFieldStyle(PlainTextFieldStyle())
                                 .padding(8)
                             
                             Button(action: {
-                                print("検索ボタンが押されました：\(searchText)")
                                 Task{
                                     errorMessage = ""
                                     isAlreadyRequested = false
-                                    if searchText == uid {
+                                    if searchID == uid {
                                         errorMessage = "あなたのIDです"
                                     }
                                     
-                                    matchedUser =  await firebaseService.fetchUserInfo(uid: searchText)
+                                    matchedUser = await firebaseService.fetchUserInfo(uid: searchID)
                                     
                                     if matchedUser.name == "ユーザーが存在しません" || matchedUser.name == "取得できません" {
                                         errorMessage = "ユーザーが存在しません"
@@ -92,14 +96,13 @@ struct FriendListView: View {
                                     
                                     //既に申請していないかのチェック
                                     for user in userFriendRequest {
-                                        if user.uid == searchText && user.isRecieved == false{
+                                        if user.uid == searchID && user.isRecieved == false{
                                             isAlreadyRequested = true
                                             buttonMessage = "申請済み"
-                                            
                                         }
                                     }
                                     for friend in friendsList {
-                                        if friend.uid == searchText{
+                                        if friend.uid == searchID{
                                             isAlreadyRequested = true
                                             buttonMessage = "フレンド登録済み"
                                         }
@@ -112,11 +115,11 @@ struct FriendListView: View {
                                     .padding(.horizontal, 20)
                                     .padding(.vertical, 8)
                                     .background(Color.blue)
-                                    .opacity(searchText.isEmpty ? 0.6 : 0.8)
+                                    .opacity(searchID.isEmpty ? 0.6 : 1)
                                     .foregroundColor(.white)
                                     .cornerRadius(8)
                             }
-                            .disabled(searchText.isEmpty)
+                            .disabled(searchID.isEmpty)
                             
                         }
                         .padding(.leading,16)
@@ -137,7 +140,7 @@ struct FriendListView: View {
                             if isAlreadyRequested {
                                 CustomWideButton(
                                     label: buttonMessage,
-                                    fontColor: Color.black,
+                                    fontColor: Color.white,
                                     backgroundColor: Color.gray,
                                     width: geometry.size.width * 0.8,
                                     height: geometry.size.height * 0.08,
@@ -158,6 +161,7 @@ struct FriendListView: View {
                                                 uid: uid,
                                                 friendUid: matchedUser.uid
                                             )
+                                            
                                             isAlreadyRequested = true
                                         }
                                     }
@@ -179,7 +183,7 @@ struct FriendListView: View {
                     }
                     
                     //MARK: 承認待ちの確認
-                    if !userFriendRequest.isEmpty{
+                    if hasReceivedRequest{
                         Text("承認待ち")
                             .font(.title3)
                         
@@ -202,6 +206,7 @@ struct FriendListView: View {
                                             )
                                             userFriendRequest = await firebaseService.fetchFriendRequestList(uid: uid)
                                             friendsList = await firebaseService.fetchFriendsList(uid: uid)
+                                            hasReceivedRequest = firebaseService.hasReceievedFriendRequest(requests: userFriendRequest)
                                         }
                                     }){
                                         Text("拒否")
@@ -219,16 +224,17 @@ struct FriendListView: View {
                                         Task{
                                             await firebaseService.addFriend(
                                                 uid: uid ,
-                                                friendUid: request.uid)
+                                                friendUid: request.uid
+                                            )
                                             
                                             await firebaseService.deleteFriendRequest(
                                                 uid: uid,
                                                 friendUid: request.uid
                                             )
-                                            
+
                                             userFriendRequest = await firebaseService.fetchFriendRequestList(uid: uid)
-                                            
                                             friendsList = await firebaseService.fetchFriendsList(uid: uid)
+                                            hasReceivedRequest = firebaseService.hasReceievedFriendRequest(requests: userFriendRequest)
                                         }
                                         
                                     }){
@@ -262,6 +268,10 @@ struct FriendListView: View {
                                 .buttonStyle(.plain)
                                 .listRowBackground(Color.clear)
                                 .contentShape(Rectangle()) // タップ領域の指定
+                                .onTapGesture {
+                                    friendInfo = friend
+                                    isFriendProfilePresented = true
+                                }
                             }
                             .listRowSeparator(.hidden)
                         }
@@ -280,11 +290,16 @@ struct FriendListView: View {
                 uid = authService.currentUser?.uid ?? ""
                 friendsList = await firebaseService.fetchFriendsList(uid: uid)
                 userFriendRequest = await firebaseService.fetchFriendRequestList(uid: uid)
+                hasReceivedRequest = firebaseService.hasReceievedFriendRequest(requests: userFriendRequest)
             }
+        }
+        .fullScreenCover(isPresented: $isFriendProfilePresented){
+            FriendProfileView(isFriendProfilePresented: $isFriendProfilePresented, friendInfo: $friendInfo)
         }
     }
 }
 
 #Preview {
     FriendListView()
+        .environmentObject(AuthService())
 }

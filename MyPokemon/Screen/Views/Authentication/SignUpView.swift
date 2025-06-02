@@ -48,6 +48,7 @@ struct SignUpView: View {
                 .padding(.horizontal, 24)
                 .padding(.vertical, 16)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
+                .keyboardType(.default)
                 
                 
                 TextField(
@@ -65,6 +66,7 @@ struct SignUpView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 16)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
+                .keyboardType(.emailAddress)
                 
                 
                 SecureField(
@@ -81,6 +83,7 @@ struct SignUpView: View {
                 .padding(.horizontal, 24)
                 .padding(.bottom, 80)
                 .shadow(color: .black.opacity(0.4), radius: 2, x: 3, y: 3)
+                .keyboardType(.alphabet)
                 
                 CustomWideButton(
                     label: "登録する",
@@ -96,6 +99,22 @@ struct SignUpView: View {
                             authService.isAuth = true
                     }
                 })
+            }
+        }
+        .overlay(alignment: .topTrailing){
+            HStack{
+                Spacer()
+                
+                Button(action: {
+                    isSignUpPresented = false
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .resizable()
+                        .frame(width: 30, height: 30,alignment: .trailing)
+                        .foregroundColor(.white)
+                        .shadow(radius: 2)
+                        .padding()
+                }
             }
         }
     }

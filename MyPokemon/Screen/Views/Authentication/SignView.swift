@@ -53,12 +53,12 @@ struct SignView: View {
                     .padding(.top,28)
                 }
             }
-            .sheet(isPresented: $isSignInPresented){
-                SignInView(isSignInPresented: $isSignInPresented)
-            }
-            .sheet(isPresented: $isSignUpPresented){
-                SignUpView(isSignUpPresented: $isSignUpPresented)
-            }
+        }
+        .fullScreenCover(isPresented: $isSignInPresented){
+            SignInView(isSignInPresented: $isSignInPresented)
+        }
+        .fullScreenCover(isPresented: $isSignUpPresented){
+            SignUpView(isSignUpPresented: $isSignUpPresented)
         }
     }
 }
