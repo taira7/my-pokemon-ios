@@ -41,10 +41,11 @@ struct MyPageView: View {
                 
                 ZStack {
                     if pokemonListService.isLoading {
-                        ProgressView("読み込み中...")                        .background(Color.white.opacity(0.8))
+                        ProgressView("読み込み中...")
+                            .background(Color.white.opacity(0.8))
                         
                     } else {
-                        PokemonList(pokemonDetails: pokemonDetails)
+                        PokemonList(uid: userInfo.uid, pokemonDetails: pokemonDetails)
                     }
                 }
                 
