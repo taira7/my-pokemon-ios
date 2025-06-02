@@ -11,7 +11,7 @@ struct FriendListView: View {
     @State var friendsList:[UserInfo] = []
     @State private var searchID: String = ""
     @State private var showAddFriendView: Bool = false //検索バーの表示
-    @State private var matchedUser: UserInfo = .init(uid: "", name: "", email: "") //検索に一致したユーザー
+    @State private var matchedUser: UserInfo? = nil //検索に一致したユーザー
     @State private var errorMessage: String = ""
     @State private var buttonMessage: String = ""
     
@@ -39,8 +39,9 @@ struct FriendListView: View {
                             
                             if showAddFriendView == true {
                                 //入力部分を初期化
-                                matchedUser = .init(uid: "", name: "", email: "")
+                                matchedUser = nil
                                 searchID = ""
+                                errorMessage = ""
                                 
                                 showAddFriendView = false
                             }else{
@@ -81,15 +82,16 @@ struct FriendListView: View {
                             
                             Button(action: {
                                 Task{
+                                    matchedUser = nil
                                     errorMessage = ""
                                     isAlreadyRequested = false
                                     if searchID == uid {
                                         errorMessage = "あなたのIDです"
                                     }
                                     
-                                    matchedUser = await firebaseService.fetchUserInfo(uid: searchID)
-                                    
-                                    if matchedUser.name == "ユーザーが存在しません" || matchedUser.name == "取得できません" {
+                                    if let result = await firebaseService.fetchUserInfo(uid: searchID) {
+                                        matchedUser = result
+                                    } else {
                                         errorMessage = "ユーザーが存在しません"
                                         return
                                     }
@@ -128,56 +130,56 @@ struct FriendListView: View {
                         .cornerRadius(10)
                         .padding(.bottom, 8)
                         
-                        if matchedUser.name != "" && errorMessage == "" {
-                            ProfileCard(
-                                width: geometry.size.width * 0.85,
-                                height: geometry.size.height * 0.2,
-                                user: matchedUser,
-                                isShowEmail: false,
-                                isShowButton: false
-                            )
-                            
-                            if isAlreadyRequested {
-                                CustomWideButton(
-                                    label: buttonMessage,
-                                    fontColor: Color.white,
-                                    backgroundColor: Color.gray,
-                                    width: geometry.size.width * 0.8,
-                                    height: geometry.size.height * 0.08,
-                                    isDisabled: true,
-                                    action: {}
+                        if let matchedUser = matchedUser, errorMessage == "" {
+                                ProfileCard(
+                                    width: geometry.size.width * 0.85,
+                                    height: geometry.size.height * 0.2,
+                                    user: matchedUser,
+                                    isShowEmail: false,
+                                    isShowButton: false
                                 )
-                            }else{
-                                CustomWideButton(
-                                    label: "フレンド申請する",
-                                    fontColor: Color.white,
-                                    backgroundColor: Color.blue,
-                                    width: geometry.size.width * 0.8,
-                                    height: geometry.size.height * 0.08,
-                                    isDisabled: false,
-                                    action: {
-                                        Task{
-                                            await firebaseService.sendFriendRequest(
-                                                uid: uid,
-                                                friendUid: matchedUser.uid
-                                            )
-                                            
-                                            isAlreadyRequested = true
-                                        }
-                                    }
-                                )
-                            }
-                            
-                        }else if matchedUser.name != "" && errorMessage != "" {
-                            HStack{
-                                Image(systemName: "info.circle")
                                 
-                                Text(errorMessage)
-                                    .font(.headline)
+                                if isAlreadyRequested {
+                                    CustomWideButton(
+                                        label: buttonMessage,
+                                        fontColor: Color.white,
+                                        backgroundColor: Color.gray,
+                                        width: geometry.size.width * 0.8,
+                                        height: geometry.size.height * 0.08,
+                                        isDisabled: true,
+                                        action: {}
+                                    )
+                                }else{
+                                    CustomWideButton(
+                                        label: "フレンド申請する",
+                                        fontColor: Color.white,
+                                        backgroundColor: Color.blue,
+                                        width: geometry.size.width * 0.8,
+                                        height: geometry.size.height * 0.08,
+                                        isDisabled: false,
+                                        action: {
+                                            Task{
+                                                await firebaseService.sendFriendRequest(
+                                                    uid: uid,
+                                                    friendUid: matchedUser.uid
+                                                )
+                                                
+                                                isAlreadyRequested = true
+                                            }
+                                        }
+                                    )
+                                }
+                                
+                            }else if errorMessage != "" {
+                                HStack{
+                                    Image(systemName: "info.circle")
+                                    
+                                    Text(errorMessage)
+                                        .font(.headline)
+                                }
+                                .foregroundColor(.red)
+                                .padding()
                             }
-                            .foregroundColor(.red)
-                            .padding()
-                        }
                         
                         Divider()
                     }

@@ -5,7 +5,7 @@
 import SwiftUI
 
 struct MyPageView: View {
-    @State private var userInfo: UserInfo = UserInfo(uid: "", name: "", email: "")
+    @State private var userInfo: UserInfo?
     @State private var pokemonDetails: [PokemonDetail] = []
     @State private var favoritePokemonIds:[Int] = []
     @EnvironmentObject var authService: AuthService
@@ -20,7 +20,7 @@ struct MyPageView: View {
                 ProfileCard(
                     width: geometry.size.width * 0.9,
                     height: geometry.size.height * 0.2,
-                    user: userInfo,
+                    user: userInfo ?? UserInfo(uid: "", name: "", email: ""),
                     isShowEmail: true,
                     isShowButton: true
                 )
@@ -45,7 +45,7 @@ struct MyPageView: View {
                             .background(Color.white.opacity(0.8))
                         
                     } else {
-                        PokemonList(uid: userInfo.uid, pokemonDetails: pokemonDetails)
+                        PokemonList(uid: authService.currentUser?.uid ?? "", pokemonDetails: pokemonDetails)
                     }
                 }
                 
