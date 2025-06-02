@@ -25,30 +25,31 @@ final class FirebaseService {
 //MARK: firebaseからのデータ取得
     
     //ユーザー情報の取得
-    func fetchUserInfo(uid:String) async -> UserInfo{
+    func fetchUserInfo(uid:String) async -> UserInfo?{
+        if uid == "" {
+            print("空のIDが渡されました")
+            return nil
+        }
+        
+        let userRef = db.collection("user").document(uid)
+        
         do{
-            if uid == "" {
-                return UserInfo(uid: "認証できません", name: "認証できません", email: "")
-            }
-            
-            let userRef = db.collection("user").document(uid)
             let userSnapshot = try await userRef.getDocument()
-            
-            if let data = userSnapshot.data(){
-                //webの方ではuidとemailしかないので，nameがない場合は，emailを代入する
-                let id = data["id"] as? String ?? ""
-                let email = data["email"] as? String ?? ""
-                let name = data["name"] as? String ?? email
-                
-                return UserInfo(uid: id, name: name, email: email)
-            }else{
+            guard let data = userSnapshot.data() else {
                 print("ユーザーが存在しません")
-                return UserInfo(uid: "ユーザーが存在しません", name: "ユーザーが存在しません", email: "")
+                return nil
             }
+            
+            //webの方ではuidとemailしかないので，nameがない場合は，emailを代入する
+            let id = data["id"] as? String ?? ""
+            let email = data["email"] as? String ?? ""
+            let name = data["name"] as? String ?? email
+            
+            return UserInfo(uid: id, name: name, email: email)
             
         }catch{
             print("ユーザー情報の取得失敗しました: \(error)")
-            return UserInfo(uid: "取得できません", name: "取得できません", email: "")
+            return nil
         }
     }
     
@@ -191,8 +192,15 @@ final class FirebaseService {
             return
         }
         
-        let userInfo = await fetchUserInfo(uid: uid)
-        let friendInfo = await fetchUserInfo(uid: friendUid)
+        guard let userInfo = await fetchUserInfo(uid: uid) else {
+            print("ユーザー情報の取得に失敗しました")
+            return
+        }
+        
+        guard let friendInfo = await fetchUserInfo(uid: friendUid) else {
+            print("フレンド情報の取得に失敗しました")
+            return
+        }
         
         let userFriendRef = db.collection("user").document(uid).collection("friends")
         let targetFriendRef = db.collection("user").document(friendUid).collection("friends")
@@ -230,6 +238,16 @@ final class FirebaseService {
         }
         let userInfo = await fetchUserInfo(uid: uid)
         let friendInfo = await fetchUserInfo(uid: friendUid)
+        
+        guard let userInfo = await fetchUserInfo(uid: uid) else {
+            print("ユーザー情報の取得に失敗しました")
+            return
+        }
+        
+        guard let friendInfo = await fetchUserInfo(uid: friendUid) else {
+            print("フレンド情報の取得に失敗しました")
+            return
+        }
         
         let senderRequestRef = db.collection("user").document(uid).collection("friendRequest")
         let recievereRequestRef = db.collection("user").document(friendUid).collection("friendRequest")
