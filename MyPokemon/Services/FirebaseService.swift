@@ -236,8 +236,6 @@ final class FirebaseService {
             print("uidまたはfriendUidが空です")
             return
         }
-        let userInfo = await fetchUserInfo(uid: uid)
-        let friendInfo = await fetchUserInfo(uid: friendUid)
         
         guard let userInfo = await fetchUserInfo(uid: uid) else {
             print("ユーザー情報の取得に失敗しました")
@@ -402,6 +400,21 @@ final class FirebaseService {
         let friendRef = userDocRef.collection("friends")
         do{
             let friendSnapshot = try await friendRef.getDocuments()
+            
+            //相手のフレンド欄から削除
+            for document in friendSnapshot.documents{
+                let documentId = document.documentID
+                
+                let targetFriendRef = db.collection("user").document(documentId).collection("friends")
+                let targetFriendSnapshot = try await targetFriendRef.getDocuments()
+                for targetDocument in targetFriendSnapshot.documents{
+                    if(targetDocument.documentID == uid){
+                        try await targetFriendRef.document(uid).delete()
+                    }
+                }
+            }
+            
+            //自分のフレンド欄から削除
             for document in friendSnapshot.documents{
                 let documentId = document.documentID
                 try await friendRef.document(documentId).delete()
@@ -410,10 +423,26 @@ final class FirebaseService {
             print("フレンドの全削除に失敗しました: \(error)")
         }
         
+        
         //フレンドリクエストの全削除
         let friendRequestRef = userDocRef.collection("friendRequest")
         do{
             let friendRequestSnapshot = try await friendRequestRef.getDocuments()
+            
+            //相手のフレンドリクエスト欄から削除
+            for document in friendRequestSnapshot.documents{
+                let documentId = document.documentID
+                
+                let targetFriendRequestRef = db.collection("user").document(documentId).collection("friendRequest")
+                let targetFriendRequestSnapshot = try await targetFriendRequestRef.getDocuments()
+                for targetDocument in targetFriendRequestSnapshot.documents{
+                    if(targetDocument.documentID == uid){
+                        try await targetFriendRequestRef.document(uid).delete()
+                    }
+                }
+            }
+            
+            //自分のフレンドリクエスト欄から削除
             for document in friendRequestSnapshot.documents{
                 let documentId = document.documentID
                 try await friendRequestRef.document(documentId).delete()
