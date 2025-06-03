@@ -159,12 +159,16 @@ struct FriendListView: View {
                                         isDisabled: false,
                                         action: {
                                             Task{
+                                                buttonMessage = "申請済み"
+                                                isAlreadyRequested = true
+                                                
                                                 await firebaseService.sendFriendRequest(
                                                     uid: uid,
                                                     friendUid: matchedUser.uid
                                                 )
                                                 
-                                                isAlreadyRequested = true
+                                                //ボタンを押した後のリクエストの更新
+                                                userFriendRequest = await firebaseService.fetchFriendRequestList(uid: uid)
                                             }
                                         }
                                     )
