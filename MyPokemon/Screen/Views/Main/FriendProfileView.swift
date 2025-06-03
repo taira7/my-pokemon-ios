@@ -52,13 +52,18 @@ struct FriendProfileView: View {
                             
                             ZStack{
                                 Capsule()
-                                    .fill(Color.red)
-                                    .frame(width: 68, height: 30)
-                                    
-                                Text("削除")
-                                    .font(.system(size: 20))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.white)
+                                    .fill(Color.white)
+                                    .frame(width: 78, height: 30)
+                                HStack(spacing: 2){
+                                    Image(systemName: "trash.fill")
+                                        .resizable()
+                                        .frame(width: 18, height: 18)
+                                        .foregroundColor(.red)
+                                    Text("削除")
+                                        .font(.system(size: 20))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.red)
+                                }
                             }
                             .padding(.leading,24)
                         }

@@ -62,6 +62,7 @@ struct NavigationBarIconOptions{
     let name: String
     let color: Color
     let isEnable: Bool
+    let placement: ToolbarItemPlacement
     let action: () -> Void
 }
 
@@ -73,7 +74,7 @@ private struct NavigationBarIconModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .toolbar{
-                ToolbarItem(placement:.navigationBarTrailing){
+                ToolbarItem(placement:options.placement){
                     Button(action: options.action,label: {
                         Image(systemName: options.name)
                             .foregroundColor(options.isEnable ? .white : .gray)})
@@ -84,7 +85,7 @@ private struct NavigationBarIconModifier: ViewModifier {
 }
 
 extension View {
-    func NavigationBarIconSetting(name:String,color:Color,isEnable:Bool,action:@escaping ()->Void)-> some View {
-        modifier(NavigationBarIconModifier(options: .init(name: name, color: color,isEnable: isEnable,action: action)))
+    func NavigationBarIconSetting(name:String,color:Color,isEnable:Bool,placement:ToolbarItemPlacement, action:@escaping ()->Void)-> some View {
+        modifier(NavigationBarIconModifier(options: .init(name: name, color: color,isEnable: isEnable, placement: placement,action: action)))
     }
 }

@@ -5,7 +5,8 @@
 import SwiftUI
 
 struct InitialView: View {
-        @State private var selectedTab : String = "PokemonListView"
+//        @State private var selectedTab : String = "PokemonListView"
+    @State private var selectedTab : String = "MyPageView"
     
     @EnvironmentObject var authService:AuthService
     

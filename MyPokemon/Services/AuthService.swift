@@ -59,18 +59,32 @@ final class AuthService:ObservableObject{
         }
     }
     
+    func deleteUser()async -> Void{
+        Auth.auth().currentUser?.delete{ error in
+            if let error = error {
+                print(error)
+            }else{
+                Task{
+                    await self.firebaseService.deleteAllUserData(uid: self.currentUser?.uid ?? "")
+                    await self.signOut()
+                    print("ユーザーデータの削除に成功しました")
+                }
+            }
+        }
+    }
+    
     private func observeAuthChanges() {
             _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             //weakではoptional型になる
 //            print("observedAuthChanges:",user)
                 
-            DispatchQueue.main.async {
-                self?.currentUser = user
-                if user != nil {
-                    self?.isAuth = true
-                }else{
-                    self?.isAuth = false
-                }
+                DispatchQueue.main.async {
+                    self?.currentUser = user
+                    if user != nil {
+                        self?.isAuth = true
+                    }else{
+                        self?.isAuth = false
+                    }
                 }
             
         }
