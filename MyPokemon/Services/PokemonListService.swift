@@ -39,12 +39,11 @@ struct PokemonDetail: Decodable {
     let types: [PokemonTypeEntry]
 }
 
-@MainActor
  final class PokemonListService:ObservableObject {
     
      @Published var limit = 100
     
-     @Published var pokemonResponse: PokemonListResponse? = nil
+     var pokemonResponse: PokemonListResponse? = nil
     
      @Published var isLoading: Bool = false
     
@@ -93,14 +92,14 @@ struct PokemonDetail: Decodable {
      func fetchAllPokemonDetails(offset:Int) async -> [PokemonDetail]{
         var pokemonSummaries: [PokemonSummary] = []
         
-        await MainActor.run{
+         DispatchQueue.main.async {
             self.isLoading = true
         }
         
          pokemonResponse = await fetchPokemonListResponse(offset: offset)
         guard let pokemonResponse = pokemonResponse else {
             print("ポケモンリスト取得エラー")
-            await MainActor.run{
+            DispatchQueue.main.async {
                 self.isLoading = false
             }
             return []
@@ -137,8 +136,8 @@ struct PokemonDetail: Decodable {
             return detail.1
         }
 
-        // 一括でUI更新（MainActorで）
-        await MainActor.run {
+        //UI更新
+         DispatchQueue.main.async {
             self.isLoading = false
         }
          

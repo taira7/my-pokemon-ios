@@ -9,9 +9,11 @@ import SwiftUI
 struct SignInView: View {
     @EnvironmentObject var authService:AuthService
     
-    @Binding var isSignInPresented: Bool
     @State var email: String = ""
     @State var password: String = ""
+    
+    @Binding var isSignInPresented: Bool
+    @State private var isErrorPresented = false
 
     let gradient = Gradient(stops: [
         .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),
@@ -20,7 +22,7 @@ struct SignInView: View {
     
     private func isInputInvalid() -> Bool {
         return email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-               password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        password.trimmingCharacters(in: .whitespacesAndNewlines).count < 6
     }
     
     
@@ -55,7 +57,7 @@ struct SignInView: View {
                 
                 SecureField(
                     text: $password,
-                    prompt: Text("パスワード")
+                    prompt: Text("パスワード(6文字以上)")
                 ) {
                 }
                 .font(.system(size: 20))
@@ -77,12 +79,14 @@ struct SignInView: View {
                     height: 36,
                     isDisabled: isInputInvalid(),
                     action: {
-                        isSignInPresented = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-                            authService.signIn(email: email, password: password)
-                            authService.isAuth = true
+                        Task {
+                            isSignInPresented = await !authService.signIn(email: email, password: password)
+                            if authService.errorMessage != nil {
+                                isErrorPresented = true
+                            }
+                        }
                     }
-                })
+                )
             }
         }
         .overlay(alignment: .topTrailing){
@@ -100,6 +104,13 @@ struct SignInView: View {
                         .padding()
                 }
             }
+        }
+        .alert("エラー",isPresented: $isErrorPresented){
+            Button("OK",role: .cancel){
+                authService.errorMessage = nil
+            }
+        } message: {
+            Text(authService.errorMessage ?? "")
         }
     }
 }

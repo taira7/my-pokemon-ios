@@ -10,40 +10,64 @@ final class AuthService:ObservableObject{
     @Published var currentUser: User? = nil
     let firebaseService = FirebaseService()
     
+    //Auth.auth()の処理関連の返り値がVoidなので，エラーメッセージをここで管理する
+    @Published var errorMessage: String?
+    
     init(){
         observeAuthChanges()
     }
     
-    func signUp(name:String, email: String, password: String) -> Void{
-        Auth.auth().createUser(withEmail: email, password: password){ authResult, error in
-//            print("authResult:",authResult)
-            
-            if let error = error{
-                print("signUp error: \(error)")
-            }
-            
-            if let userData = authResult?.user{
-                print("signUp success: \(userData)")
-                Task{
-                    await self.firebaseService.addUser(uid: userData.uid, name: name, email: email)
+    //withCheckedContinuation -> クロージャで行う非同期関数をasync/awaitに置き換える
+    //errorMessageがUIのalert表示に間に合わないのでwithCheckedContinuationを追加
+    
+    func signUp(name:String, email: String, password: String) async -> Bool{
+        do{
+            let authResult:AuthDataResult = try await withCheckedThrowingContinuation{ continuation in
+                Auth.auth().createUser(withEmail: email, password: password){ result, error in
+                    if let error = error {
+                        print("sinUp error: \(error)")
+                        continuation.resume(throwing: error)
+                    }else if let result = result {
+                        print("sinUp success: \(result)")
+                        continuation.resume(returning: result)
+                    }
                 }
-                self.signIn(email: email, password: password)
             }
+            await self.firebaseService.addUser(uid: authResult.user.uid, name: name, email: email)
+            return await self.signIn(email: email, password: password)
+            
+        }catch{
+            
+            DispatchQueue.main.async {
+                self.errorMessage = error.localizedDescription
+            }
+            
+            return false
         }
     }
     
-    func signIn(email: String, password: String) -> Void{
-        Auth.auth().signIn(withEmail: email, password: password){ [weak self] authResult, error in
-            if let error = error{
-                Task{
-                    await self?.signOut()
+    func signIn(email: String, password: String) async -> Bool{
+        do{
+            let _ :AuthDataResult = try await withCheckedThrowingContinuation{ continuation in
+                Auth.auth().signIn(withEmail: email, password: password){ result, error in
+                    if let error = error {
+                        print("signIn error: \(error)")
+                        continuation.resume(throwing: error)
+                    }else if let result = result {
+                        print("signIn success: \(result)")
+                        continuation.resume(returning: result)
+                    }
                 }
-                print("signIn error: \(error)")
             }
+            return true
+        }catch{
             
-            if let userData = authResult?.user{
-                print("signIn success: \(userData)")
+            DispatchQueue.main.async {
+                self.errorMessage = error.localizedDescription
             }
+
+            await self.signOut()
+            return false
         }
     }
     
@@ -51,9 +75,6 @@ final class AuthService:ObservableObject{
         do {
             try Auth.auth().signOut()
             print("signOut success:")
-            DispatchQueue.main.async {
-                self.isAuth = false
-            }
         } catch let signOutError as NSError {
           print("Error signing out: %@", signOutError)
         }

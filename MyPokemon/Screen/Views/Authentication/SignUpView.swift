@@ -6,10 +6,13 @@ import SwiftUI
 
 struct SignUpView: View {
     @EnvironmentObject var authService:AuthService
-    @Binding var isSignUpPresented: Bool
+    
     @State var name: String = ""
     @State var email: String = ""
     @State var password: String = ""
+    
+    @Binding var isSignUpPresented: Bool
+    @State private var isErrorPresented = false
 
     let gradient = Gradient(stops: [
         .init(color: Color(red: 1.0, green: 0.6, blue: 0.2), location: 0.0),  // 橙（オレンジ）
@@ -19,7 +22,7 @@ struct SignUpView: View {
     private func isInputInvalid() -> Bool {
         return name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
                email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-               password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+               password.trimmingCharacters(in: .whitespacesAndNewlines).count < 6
     }
     
     var body: some View {
@@ -71,7 +74,7 @@ struct SignUpView: View {
                 
                 SecureField(
                     text: $password,
-                    prompt: Text("パスワード")
+                    prompt: Text("パスワード(6文字以上)")
                 ) {
                 }
                 .font(.system(size: 20))
@@ -93,12 +96,14 @@ struct SignUpView: View {
                     height: 36,
                     isDisabled: isInputInvalid(),
                     action: {
-                        isSignUpPresented = false
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2){
-                            authService.signUp(name: name, email: email, password: password)
-                            authService.isAuth = true
+                        Task {
+                            isSignUpPresented = await !authService.signUp(name: name, email: email, password: password)
+                            if authService.errorMessage != nil {
+                                isErrorPresented = true
+                            }
+                        }
                     }
-                })
+                )
             }
         }
         .overlay(alignment: .topTrailing){
@@ -116,6 +121,13 @@ struct SignUpView: View {
                         .padding()
                 }
             }
+        }
+        .alert("エラー",isPresented: $isErrorPresented){
+            Button("OK",role: .cancel){
+                authService.errorMessage = nil
+            }
+        } message: {
+            Text(authService.errorMessage ?? "")
         }
     }
 }

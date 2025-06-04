@@ -65,10 +65,12 @@ struct PokemonIdTab: View {
                     Spacer(minLength: itemWidth)
                 }
             }
-            //responseが返ってくるまで待つため
-            .onReceive(pokemonListService.$pokemonResponse) { newValue in
-                if let response = newValue {
-                    generateTabRange(with: response.count)
+            .onAppear{
+                Task{
+                    let response =  await pokemonListService.fetchPokemonListResponse(offset: 0)
+                    if let response = response {
+                        generateTabRange(with: response.count)
+                    }
                 }
             }
         }
