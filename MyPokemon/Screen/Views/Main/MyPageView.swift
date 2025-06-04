@@ -76,11 +76,10 @@ struct MyPageView: View {
                     if authService.currentUser != nil {
                         await authService.deleteUser()
                     }
-                print("データが削除されました")
                 }
             }
         } message: {
-            Text("この操作は取り消せません。")
+            Text("削除後は元に戻せません")
         }
         .onAppear(){
             Task{

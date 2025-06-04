@@ -119,8 +119,6 @@ final class FirebaseService {
             let friendRequestSnapshot = try await friendRequestRef.getDocuments()
             for document in friendRequestSnapshot.documents{
                 let data = document.data()
-                print("documentID:",document.documentID)
-                
                 let id = data["id"] as? String ?? ""
                 let email = data["email"] as? String ?? ""
                 let name = data["name"] as? String ?? email
@@ -162,7 +160,6 @@ final class FirebaseService {
                 "name": name,
                 "email": email
             ])
-            print("ユーザー登録に成功しました")
         } catch {
             print("ユーザー登録に失敗しました: \(error)")
         }
@@ -179,7 +176,6 @@ final class FirebaseService {
             try await favoriteRef.addDocument(data:[
                 "id": pokemonId
             ])
-            print("お気に入りに追加されました")
         } catch {
             print("お気に入り登録に失敗しました: \(error)")
         }
@@ -221,8 +217,6 @@ final class FirebaseService {
                 "name": userInfo.name,
                 "email": userInfo.email,
             ])
-            
-            print("フレンドの追加に成功しました")
             
         }catch{
             print("フレンドの追加に失敗しました： \(error)")
@@ -312,7 +306,6 @@ final class FirebaseService {
                     print("document \(documentId) に \(uid) が存在しません")
                 }
             }
-            print("フレンドの削除に成功しました")
         }catch{
             print("フレンドの削除に失敗しました: \(error)")
         }
@@ -356,7 +349,6 @@ final class FirebaseService {
                     print("document \(documentId) に \(uid) が存在しません")
                 }
             }
-            print("フレンドリクエストの削除に成功しました")
         }catch{
             print("フレンドリクエストの削除に失敗しました: \(error)")
         }
@@ -381,7 +373,6 @@ final class FirebaseService {
                     }
                 }
             }
-            print("お気に入りの削除に成功しました")
         }catch{
             print("お気に入りの削除に失敗しました: \(error)")
         }
