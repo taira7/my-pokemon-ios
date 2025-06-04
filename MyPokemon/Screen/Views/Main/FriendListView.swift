@@ -273,7 +273,7 @@ struct FriendListView: View {
                                 )
                                 .buttonStyle(.plain)
                                 .listRowBackground(Color.clear)
-                                .contentShape(Rectangle()) // タップ領域の指定
+                                .contentShape(Rectangle()) // タップ領域の指定 これがないとProfileのボタンが効く
                                 .onTapGesture {
                                     friendInfo = friend
                                     isFriendProfilePresented = true

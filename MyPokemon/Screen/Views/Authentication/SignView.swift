@@ -37,14 +37,13 @@ struct SignView: View {
                         height: geometry.size.height * 0.07,
                         isDisabled: false,
                         action: {
-                            print("ログイン")
-                            isSignInPresented.toggle()
+                            isSignInPresented  = true
                             
                         }
                     )
                     
                     Button(action:{
-                        isSignUpPresented.toggle()
+                        isSignUpPresented = true
                     },label: {
                         Text("アカウントを作成する")
                             .font(.headline)

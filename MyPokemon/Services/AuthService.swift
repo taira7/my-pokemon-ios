@@ -18,7 +18,7 @@ final class AuthService:ObservableObject{
     }
     
     //withCheckedContinuation -> クロージャで行う非同期関数をasync/awaitに置き換える
-    //errorMessageがUIのalert表示に間に合わないのでwithCheckedContinuationを追加
+    //Auth.auth()の処理がerrorMessageのalert表示に間に合わないのでwithCheckedContinuationを追加
     
     func signUp(name:String, email: String, password: String) async -> Bool{
         do{
@@ -28,7 +28,6 @@ final class AuthService:ObservableObject{
                         print("sinUp error: \(error)")
                         continuation.resume(throwing: error)
                     }else if let result = result {
-                        print("sinUp success: \(result)")
                         continuation.resume(returning: result)
                     }
                 }
@@ -54,7 +53,6 @@ final class AuthService:ObservableObject{
                         print("signIn error: \(error)")
                         continuation.resume(throwing: error)
                     }else if let result = result {
-                        print("signIn success: \(result)")
                         continuation.resume(returning: result)
                     }
                 }
@@ -74,7 +72,6 @@ final class AuthService:ObservableObject{
     func signOut()async -> Void{
         do {
             try Auth.auth().signOut()
-            print("signOut success:")
         } catch let signOutError as NSError {
           print("Error signing out: %@", signOutError)
         }
@@ -88,7 +85,6 @@ final class AuthService:ObservableObject{
                 Task{
                     await self.firebaseService.deleteAllUserData(uid: self.currentUser?.uid ?? "")
                     await self.signOut()
-                    print("ユーザーデータの削除に成功しました")
                 }
             }
         }
@@ -97,8 +93,6 @@ final class AuthService:ObservableObject{
     private func observeAuthChanges() {
             _ = Auth.auth().addStateDidChangeListener { [weak self] _, user in
             //weakではoptional型になる
-//            print("observedAuthChanges:",user)
-                
                 DispatchQueue.main.async {
                     self?.currentUser = user
                     if user != nil {

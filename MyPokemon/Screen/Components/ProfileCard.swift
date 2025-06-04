@@ -45,7 +45,6 @@ struct ProfileCard: View {
                         if isShowButton {
                             Button(action: {
                                 UIPasteboard.general.string = user.uid
-                                print("コピーされました")
                             }){
                                 ZStack{
                                     Circle()
@@ -62,7 +61,6 @@ struct ProfileCard: View {
                     }
                 }
                 .frame(maxWidth: .infinity,alignment: .leading)
-//                .background(Color.red)
                 
                 Spacer()
             }

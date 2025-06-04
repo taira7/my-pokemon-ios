@@ -1,8 +1,6 @@
 //
 //  SignIn.swift
 //  MyPokemon
-//
-
 
 import SwiftUI
 
