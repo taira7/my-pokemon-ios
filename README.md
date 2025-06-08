@@ -1,5 +1,20 @@
 # my-pokemon-ios
 
+好きなポケモンを人と共有できるアプリケーションです。Web 版と iOS 版があります。
+
+- Web 版の github のリンク：my-pokemon-web (<https://github.com/taira7/my-pokemon-web>)
+
+アプリで使用するポケモンのデータは、以下の API から取得し利用させていただきました。
+
+- PokéAPI (<https://pokeapi.co/>)
+
+## 使用技術
+
+- **フロントエンド**: SwiftUI
+- **使用した WebAPI**: [PokéAPI]("https://pokeapi.co/")
+- **データベース**: Firebase Firestore
+- **認証機能**: Firebase Authentication
+
 ## 機能一覧
 
 |                  トップ画面                  |                                          ログイン画面                                          |                      アカウント登録画面                      |                                                         一覧画面                                                         |
