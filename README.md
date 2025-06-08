@@ -10,8 +10,14 @@
 
 ## 使用技術
 
-- **フロントエンド**: SwiftUI
-- **使用した WebAPI**: [PokéAPI]("https://pokeapi.co/")
+### フロントエンド
+
+- **開発言語**: Swift
+- **フレームワーク**: SwiftUI
+
+### バックエンド
+
+- **使用した Web API**: [PokéAPI](https://pokeapi.co/)
 - **データベース**: Firebase Firestore
 - **認証機能**: Firebase Authentication
 
