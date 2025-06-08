@@ -30,7 +30,7 @@ struct SignInView: View {
                 .ignoresSafeArea()
 
             VStack{
-                Text("サインイン")
+                Text("ログイン")
                     .font(.system(size: 32, weight: .medium, design: .rounded))
                     .foregroundColor(Color.white.opacity(0.85))
                     .shadow(color: .black.opacity(0.3), radius: 2, x: 3, y: 3)
